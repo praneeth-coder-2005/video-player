@@ -5,7 +5,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #333;
+  background-color: #111;
 }
 
 .video-container {
@@ -24,7 +24,7 @@ video {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
   padding: 10px;
 }
 
@@ -42,22 +42,5 @@ button {
 }
 
 button:hover {
-  background-color: #666;
-}
-
-.download-links {
-  text-align: center;
-  margin-top: 10px;
-}
-
-.download-links a {
-  color: white;
-  text-decoration: none;
-  background-color: #444;
-  padding: 8px 12px;
-  border-radius: 5px;
-}
-
-.download-links a:hover {
   background-color: #666;
 }
