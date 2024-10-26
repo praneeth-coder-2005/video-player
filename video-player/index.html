@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Custom Video Player</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Streamtape-Style Player</title>
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <div class="video-container">
-    <video id="videoPlayer" preload="auto" controls>
-      <source src="./videos/sample.mkv" type="video/x-matroska">
+    <video id="videoPlayer" controls preload="auto">
+      <source src="https://streamtape.site/v/1Ox8eePG0GIeo6j" type="video/mp4">
       <p>Your browser does not support the video tag.</p>
     </video>
 
@@ -19,12 +19,8 @@
       <span id="timeDisplay">0:00 / 0:00</span>
       <button id="fullscreenButton">Fullscreen</button>
     </div>
-
-    <div class="download-links">
-      <a href="./videos/sample.mkv" download>Download MKV</a>
-    </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="./script.js"></script>
 </body>
 </html>
