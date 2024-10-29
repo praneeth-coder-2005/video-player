@@ -11,14 +11,10 @@ def leech(update: Update, context: CallbackContext):
     url = update.message.text.strip()
     
     try:
-        # Determine the filename from the URL
-        filename = url.split('/')[-1]
-        local_path = f'./downloads/{filename}'
-
-        # Download the file
+        # Download the file to the downloads directory
         update.message.reply_text('Downloading...')
-        download_file(url, local_path)
-        
+        local_path = download_file(url, './downloads')
+
         # Send the file back to the user
         update.message.reply_text('Uploading...')
         update.message.reply_document(document=open(local_path, 'rb'))
