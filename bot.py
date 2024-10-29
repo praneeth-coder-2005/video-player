@@ -1,28 +1,37 @@
+import os
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 from config import BOT_TOKEN
+from downloader import download_file
 
-# Start command handler
 def start(update: Update, context: CallbackContext):
-    update.message.reply_text('Hello! Send me a URL to mirror it.')
+    update.message.reply_text('Hello! Send me a URL and I will leech the file for you.')
 
-# Mirror handler for responding with the received URL
-def mirror(update: Update, context: CallbackContext):
+def leech(update: Update, context: CallbackContext):
     url = update.message.text.strip()
     
-    # Just acknowledge the URL received
-    response_message = f"URL received: {url}\n(Mirroring functionality is currently not implemented)"
-    update.message.reply_text(response_message)
+    try:
+        # Determine the filename from the URL
+        filename = url.split('/')[-1]
+        local_path = f'./downloads/{filename}'
+
+        # Download the file
+        update.message.reply_text('Downloading...')
+        download_file(url, local_path)
+        
+        # Provide the download link
+        download_link = f"Downloaded file available at: {os.path.abspath(local_path)}"
+        update.message.reply_text(download_link)
+    except Exception as e:
+        update.message.reply_text(f"Failed to download the file: {str(e)}")
 
 def main():
     updater = Updater(BOT_TOKEN)
     dp = updater.dispatcher
     
-    # Register command handlers
     dp.add_handler(CommandHandler('start', start))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, mirror))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, leech))
     
-    # Start the bot
     updater.start_polling()
     updater.idle()
 
