@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: mirror-leech-bot
+    env: python
+    region: oregon       # Change to your preferred region
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python bot.py"
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        value: ${TELEGRAM_BOT_TOKEN}
