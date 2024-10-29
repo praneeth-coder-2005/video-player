@@ -1,22 +1,13 @@
 import os
-import requests
-from urllib.parse import urlparse, unquote
+from dotenv import load_dotenv
 
-def download_file(url, dest_dir):
-    # Parse the URL and extract the file name
-    parsed_url = urlparse(url)
-    filename = os.path.basename(parsed_url.path)
-    filename = unquote(filename)  # Decode the URL encoding to get a readable filename
+# Load environment variables from .env file
+load_dotenv()
 
-    # Ensure the destination directory exists
-    os.makedirs(dest_dir, exist_ok=True)
-    dest_path = os.path.join(dest_dir, filename)
+BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
-    # Download the file
-    response = requests.get(url, stream=True)
-    response.raise_for_status()  # Ensure we raise an error if the download failed
-    with open(dest_path, 'wb') as file:
-        for chunk in response.iter_content(chunk_size=8192):
-            file.write(chunk)
-    
-    return dest_path
+# Debug print statement to verify if the token is loaded correctly
+print(f"Loaded TELEGRAM_BOT_TOKEN: {BOT_TOKEN}")
+
+if not BOT_TOKEN:
+    raise ValueError("No TELEGRAM_BOT_TOKEN found in environment variables")
