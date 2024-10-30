@@ -5,13 +5,13 @@ from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandle
 from config import BOT_TOKEN
 from downloader import download_file, get_copy_type
 import traceback
-from tqdm import tqdm
 import psutil  # For system performance information
+from tqdm import tqdm
 
 # Initialize Flask app
 app = Flask(__name__)
 
-# WARNING: Using global variable to hold the updater
+# Set up the Updater
 updater = Updater(BOT_TOKEN)
 
 # Ensure the downloads directory exists
@@ -30,7 +30,7 @@ def leech(update: Update, context: CallbackContext):
     print(f"Received URL: {url}")  # Debug output
 
     # Basic URL validation
-    if not url.startswith("http://") and not url.startswith("https://"):
+    if not url.startswith(("http://", "https://")):
         update.message.reply_text("Please provide a valid URL that starts with 'http://' or 'https://'.")
         return
 
@@ -52,26 +52,10 @@ def leech(update: Update, context: CallbackContext):
 
         with open(local_path, 'rb') as file:
             # Use tqdm to show upload progress while loading the file
-            with tqdm(total=file_size, unit='B', unit_scale=True, desc='Uploading', 
-                      bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{rate_fmt}{postfix}]") as bar:
-                
-                file_content = file.read()  # Read the entire file content
-                context.bot.send_document(chat_id=update.effective_chat.id, document=file_content,
-                                          timeout=120, 
-                                          disable_notification=True)
-
-                # Update the progress bar
-                bar.update(file_size)
-
-                # Show system performance stats
-                cpu_percent = psutil.cpu_percent()
-                ram_info = psutil.virtual_memory()
-                free_ram = ram_info.available / (1024 * 1024)  # Convert to MB
-                processed_mb = file_size / (1024 * 1024)  # Total Size in MB
-
-                print(f"├ Uploaded: {processed_mb:.2f}MB")
-                print(f"├ Total Size: {file_size / (1024 * 1024):.2f}MB")
-                print(f"├ CPU: {cpu_percent}% | RAM: {ram_info.percent}% | FREE: {free_ram:.2f}MB")
+            content = file.read()  # Read the entire file content
+            context.bot.send_document(chat_id=update.effective_chat.id, document=content,
+                                      timeout=120, 
+                                      disable_notification=True)
 
         # Cleanup
         os.remove(local_path)
@@ -81,13 +65,17 @@ def leech(update: Update, context: CallbackContext):
         traceback.print_exc()  # Print the full stack trace
         update.message.reply_text(f"Failed to process the request: {str(e)}")
 
-   @app.route('/webhook', methods=['POST'])
-       def webhook():
-       print(request.json)  # Log incoming request
-       # Your existing logic here
-       return '', 200
-  
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    json_data = request.get_json()  # Get incoming update
+    update = Update.de_json(json_data, updater.bot)  # Create an Update object
+    updater.dispatcher.process_update(update)  # Process the update
+    return '', 200  # Return success status
+
+# Add command and message handlers
+updater.dispatcher.add_handler(CommandHandler('start', start))
+updater.dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, leech))
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))  # Assign port for deployment
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port) 
