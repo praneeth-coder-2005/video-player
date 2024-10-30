@@ -1,11 +1,3 @@
-@app.route('/')
-   def index():
-       return "Telegram Bot is running!", 200
-   ```
-
-   Here's how your updated `bot.py` would look:
-
-   ```python
    import os
    from flask import Flask, request
    from telegram import Update
