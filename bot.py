@@ -64,10 +64,10 @@ async def leech(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"Failed to process the request: {str(e)}")
 
 @app.route('/webhook', methods=['POST'])
-def webhook():
+async def webhook():
     json_data = request.get_json()  # Get incoming update
     update = Update.de_json(json_data, application.bot)  # Create an Update object
-    application.dispatcher.process_update(update)  # Process the update
+    await application.process_update(update)  # Process the update
     return '', 200  # Return success status
 
 # Add command and message handlers
