@@ -20,14 +20,14 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 @app.route('/')
 def index():
-    return "Telegram Bot is running!", 200  # Optional root route
+    return "Telegram Bot is running!", 200  # Optional root route for health check
 
 def start(update: Update, context: CallbackContext):
     update.message.reply_text('Hello! Send me a URL and I will download the file and send it back to you.')
 
 def leech(update: Update, context: CallbackContext):
     url = update.message.text.strip()
-    print(f"Received URL: {url}")  # Debugging output
+    print(f"Received URL: {url}")  # Debug output
 
     # Basic URL validation
     if not url.startswith("http://") and not url.startswith("https://"):
