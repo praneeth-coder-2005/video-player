@@ -54,3 +54,7 @@ def download_file(url, dest_dir):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         return None
+
+def get_copy_type(filepath):
+    # Here you can implement logic to determine the file type if needed.
+    return "unknown"  # Placeholder for MIME type determination
