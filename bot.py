@@ -5,6 +5,7 @@ from config import BOT_TOKEN
 from downloader import download_file, get_copy_type
 import traceback
 from tqdm import tqdm
+import psutil  # For system performance information
 
 # Ensure the downloads directory exists
 DOWNLOAD_DIR = './downloads'
@@ -25,8 +26,7 @@ def leech(update: Update, context: CallbackContext):
     try:
         update.message.reply_text('Downloading...')
         local_path = download_file(url, DOWNLOAD_DIR)
-
-        if local_path is None:
+    if local_path is None:
             update.message.reply_text('Failed to download the file. Please check the URL and try again.')
             return
 
@@ -36,21 +36,31 @@ def leech(update: Update, context: CallbackContext):
 
         update.message.reply_text('Uploading...')
         
-        # Determine file size for progres
         file_size = os.path.getsize(local_path)
 
         with open(local_path, 'rb') as file:
-            # Use tqdm to show upload progress
-            with tqdm(total=file_size, unit='B', unit_scale=True, desc=local_path) as bar:
-                while True:
-                    chunk = file.read(8192)
-                    if not chunk:
-                        break
-                    context.bot.send_document(chat_id=update.effective_chat.id, document=chunk,
-                                              timeout=120, 
-                                              disable_notification=True)
-                    bar.update(len(chunk))
-        
+            # Use tqdm to show upload progress while loading the file
+            with tqdm(total=file_size, unit='B', unit_scale=True, desc='Uploading', 
+                      bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{rate_fmt}{postfix}]") as bar:
+                
+                file_content = file.read()  # Read the entire file content
+                context.bot.send_document(chat_id=update.effective_chat.id, document=file_content,
+                                          timeout=120, 
+                                          disable_notification=True)
+
+                # Update the progress bar
+                bar.update(file_size)
+
+                # Show system performance stats
+                cpu_percent = psutil.cpu_percent()
+                ram_info = psutil.virtual_memory()
+                free_ram = ram_info.available / (1024 * 1024)  # Convert to MB
+                processed_mb = file_size / (1024 * 1024)  # Total Size in MB
+
+                print(f"├ Uploaded: {processed_mb:.2f}MB")
+                print(f"├ Total Size: {file_size / (1024 * 1024):.2f}MB")
+                print(f"├ CPU: {cpu_percent}% | RAM: {ram_info.percent}% | FREE: {free_ram:.2f}MB")
+
         # Cleanup
         os.remove(local_path)
 
