@@ -37,7 +37,7 @@ def leech(update: Update, context: CallbackContext):
         update.message.reply_text('Uploading...')
         
         # Determine file size for progres
-               file_size = os.path.getsize(local_path)
+        file_size = os.path.getsize(local_path)
 
         with open(local_path, 'rb') as file:
             # Use tqdm to show upload progress
