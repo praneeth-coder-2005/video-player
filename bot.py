@@ -81,12 +81,12 @@ def leech(update: Update, context: CallbackContext):
         traceback.print_exc()  # Print the full stack trace
         update.message.reply_text(f"Failed to process the request: {str(e)}")
 
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    json_data = request.get_json()  # Get incoming update
-    update = Update.de_json(json_data, updater.bot)  # Create an Update object
-    updater.dispatcher.process_update(update)  # Process the update
-    return '', 200  # Return success status
+   @app.route('/webhook', methods=['POST'])
+   def webhook():
+       print(request.json)  # Log incoming request
+       # Your existing logic here
+       return '', 200
+  
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))  # Assign port for deployment
