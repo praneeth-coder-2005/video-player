@@ -1,4 +1,5 @@
 import os
+from flask import Flask, request
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 from config import BOT_TOKEN
@@ -6,6 +7,12 @@ from downloader import download_file, get_copy_type
 import traceback
 from tqdm import tqdm
 import psutil  # For system performance information
+
+# Initialize Flask app
+app = Flask(__name__)
+
+# WARNING: Using global variable to hold the updater
+updater = Updater(BOT_TOKEN)
 
 # Ensure the downloads directory exists
 DOWNLOAD_DIR = './downloads'
@@ -26,7 +33,8 @@ def leech(update: Update, context: CallbackContext):
     try:
         update.message.reply_text('Downloading...')
         local_path = download_file(url, DOWNLOAD_DIR)
-    if local_path is None:
+
+        if local_path is None:
             update.message.reply_text('Failed to download the file. Please check the URL and try again.')
             return
 
@@ -69,21 +77,16 @@ def leech(update: Update, context: CallbackContext):
         traceback.print_exc()  # Print the full stack trace
         update.message.reply_text(f"Failed to process the request: {str(e)}")
 
-def main():
-    try:
-        print(f"Using BOT_TOKEN: {BOT_TOKEN}")  # Debug print statement
-        updater = Updater(BOT_TOKEN)
-        dp = updater.dispatcher
-
-        dp.add_handler(CommandHandler('start', start))
-        dp.add_handler(MessageHandler(Filters.text & ~Filters.command, leech))
-
-        updater.start_polling()
-        updater.idle()
-
-    except ValueError as e:
-        print(f"Error: {e}")
-        exit(1)
-
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    json_data = request.get_json()  # Get incoming update
+    update = Update.de_json(json_data, updater.bot)  # Create an Update object
+    updater.dispatcher.process_update(update)  # Process the update
+    return '', 200  # Return succes
 if __name__ == '__main__':
-    main()
+    port = int(os.environ.get('PORT', 5000))  # Assign port for deployment
+    app.run(host='0.0.0.0', port=port)  # Start the Flask app
+
+    # Start the bot using polling
+    # Uncomment this line if you want to use polling instead of webhooks
+    # updater.start_polling()
