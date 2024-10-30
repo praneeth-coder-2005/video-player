@@ -2,10 +2,11 @@ import os
 from flask import Flask, request
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
-from config import BOT_TOKEN
 from downloader import download_file, get_copy_type
 import traceback
-import psutil  # For system performance information
+
+# Replace with your actual bot token (keep it secure in production)
+BOT_TOKEN = '7820729855:AAG_ph7Skh4SqGxIWYYcRNigQqCKdnVW354'
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -72,7 +73,13 @@ def webhook():
 application.add_handler(CommandHandler('start', start))
 application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, leech))
 
+# Set webhook for the Telegram bot
+def set_webhook():
+    webhook_url = 'https://video-player-4o4x.onrender.com/webhook'
+    application.bot.set_webhook(webhook_url)
+
 # Run the bot using Flask
 if __name__ == '__main__':
+    set_webhook()  # Set the webhook before starting the server
     port = int(os.environ.get('PORT', 5000))  # Assign port for deployment
-    app.run(host='0.0.0.0', port=port) 
+    app.run(host='0.0.0.0', port=port)
