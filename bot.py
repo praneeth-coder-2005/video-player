@@ -72,7 +72,7 @@
                    print(f"├ Uploaded: {processed_mb:.2f}MB")
                    print(f"├ Total Size: {file_size / (1024 * 1024):.2f}MB")
                    print(f"├ CPU: {cpu_percent}% | RAM: {ram_info.percent}% | FREE: {free_ram:.2f}MB")
-          os.remove(local_path)
+                   os.remove(local_path)
 
        except Exception as e:
            print(f"Exception occurred: {str(e)}")
