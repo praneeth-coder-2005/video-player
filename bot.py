@@ -4,6 +4,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
 from downloader import download_file, get_copy_type
 import traceback
+import asyncio
 
 # Replace with your actual bot token (keep it secure in production)
 BOT_TOKEN = '7820729855:AAG_ph7Skh4SqGxIWYYcRNigQqCKdnVW354'
@@ -74,12 +75,12 @@ application.add_handler(CommandHandler('start', start))
 application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, leech))
 
 # Set webhook for the Telegram bot
-def set_webhook():
+async def set_webhook():
     webhook_url = 'https://video-player-4o4x.onrender.com/webhook'
-    application.bot.set_webhook(webhook_url)
+    await application.bot.set_webhook(webhook_url)
 
 # Run the bot using Flask
 if __name__ == '__main__':
-    set_webhook()  # Set the webhook before starting the server
+    asyncio.run(set_webhook())  # Await the setting of the webhook
     port = int(os.environ.get('PORT', 5000))  # Assign port for deployment
     app.run(host='0.0.0.0', port=port)
