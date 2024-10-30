@@ -1,9 +1,11 @@
-services:
-  - type: web
-    name: leech-bot
-    env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python bot.py"
-    envVars:
-      - key: TELEGRAM_BOT_TOKEN
-        value: ${7820729855:AAG_ph7Skh4SqGxIWYYcRNigQqCKdnVW354}
+   services:
+     - type: web
+       name: leech-bot
+       env: python
+       buildCommand: "pip install -r requirements.txt"
+       startCommand: "python bot.py"  # Ensure this matches your main bot file
+       # Add these environment variables if needed
+       envVars:
+         - key: TELEGRAM_BOT_TOKEN
+           value: ${TELEGRAM_BOT_TOKEN}
+   
