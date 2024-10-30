@@ -6,7 +6,6 @@ from config import BOT_TOKEN
 from downloader import download_file, get_copy_type
 import traceback
 import psutil  # For system performance information
-from tqdm import tqdm
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -51,7 +50,6 @@ def leech(update: Update, context: CallbackContext):
         file_size = os.path.getsize(local_path)
 
         with open(local_path, 'rb') as file:
-            # Use tqdm to show upload progress while loading the file
             content = file.read()  # Read the entire file content
             context.bot.send_document(chat_id=update.effective_chat.id, document=content,
                                       timeout=120, 
