@@ -2,8 +2,9 @@ import os
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 from config import BOT_TOKEN
-from downloader import download_file
+from downloader import download_file, get_copy_type
 import traceback
+from tqdm import tqdm
 
 # Ensure the downloads directory exists
 DOWNLOAD_DIR = './downloads'
@@ -29,10 +30,27 @@ def leech(update: Update, context: CallbackContext):
             update.message.reply_text('Failed to download the file. Please check the URL and try again.')
             return
 
-        update.message.reply_text('Uploading...')
-        with open(local_path, 'rb') as file:
-            update.message.reply_document(document=file)
+        # Get the file type
+        mime_type = get_copy_type(local_path)
+        print(f"Detected File Type: {mime_type}")
 
+        update.message.reply_text('Uploading...')
+        
+        # Determine file size for progres
+               file_size = os.path.getsize(local_path)
+
+        with open(local_path, 'rb') as file:
+            # Use tqdm to show upload progress
+            with tqdm(total=file_size, unit='B', unit_scale=True, desc=local_path) as bar:
+                while True:
+                    chunk = file.read(8192)
+                    if not chunk:
+                        break
+                    context.bot.send_document(chat_id=update.effective_chat.id, document=chunk,
+                                              timeout=120, 
+                                              disable_notification=True)
+                    bar.update(len(chunk))
+        
         # Cleanup
         os.remove(local_path)
 
